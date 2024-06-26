@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from math import cos, sin, pi, sqrt
 from dataclasses import dataclass
+import os
 
 app = Flask(__name__)
 
@@ -157,4 +158,6 @@ def handle_click():
     return state.get_json()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('DEBUG', 'false').lower() == 'true'
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
