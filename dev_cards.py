@@ -1,4 +1,4 @@
-import yagmail
+# import yagmail
 import random
 
 players = [
@@ -9,7 +9,7 @@ players = [
 
 class DevCards:
   def __init__(self):
-    self.yag = yagmail.SMTP('sheeps.are.best@gmail.com')
+    # self.yag = yagmail.SMTP('sheeps.are.best@gmail.com')
     self.pulled_cards = []
     cards = []
     cards += ["Knight"]*14
@@ -52,7 +52,7 @@ class DevCards:
     print("e-mail sent to ", player)
     print(contents)
     print()
-    self.yag.send(inp, subject = "Your Dev Card Selection.", contents = contents)
+    # self.yag.send(inp, subject = "Your Dev Card Selection.", contents = contents)
     return contents
 
 

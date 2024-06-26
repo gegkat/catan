@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hexagon Generator</title>
+    <script>
+        function vertexClicked(vertexId) {
+            // alert('Vertex ' + vertexId + ' clicked!');
+            document.getElementById("textToChange").innerHTML = 'Vertex ' + vertexId + ' clicked!';
+        }
+
+        function generateHexagons(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetch('/generate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const svgContainer = document.getElementById('hexagon-container');
+                svgContainer.innerHTML = '';
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('width', '800');
+                svg.setAttribute('height', '800');
+
+                // Draw hexagons
+                data.hexagon_data.forEach(points => {
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', points.map(p => p.join(',')).join(' '));
+                    polygon.setAttribute('fill', 'orange');
+                    polygon.setAttribute('stroke', 'black');
+                    svg.appendChild(polygon);
+                });
+
+                // Draw unique vertices
+                data.vertices.forEach(([x, y], index) => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', '5');
+                    circle.setAttribute('fill', 'red');
+                    circle.setAttribute('onclick', `vertexClicked('${index}')`);
+                    svg.appendChild(circle);
+                });
+
+                svgContainer.appendChild(svg);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Hexagon Layout Generator</h1>
+    <form onsubmit="generateHexagons(event)">
+        <button type="submit">Generate Hexagons</button>
+    </form>
+    <h4 id="textToChange">Click a vertex to change this text</h1>
+    <div id="hexagon-container"></div>
+</body>
+</html>

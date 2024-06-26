@@ -2,16 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Text Example</title>
+    <title>Hexagon Generator</title>
     <script>
-        function changeText() {
-            document.getElementById("textToChange").innerHTML = "You clicked the button!";
+        let vertices = [];
+        let hexagons = [];
+
+        async function generateHexagons(event) {
+            event.preventDefault();
+            const response = await fetch('/generate', { method: 'POST' });
+            const data = await response.json();
+            hexagons = data.hexagons;
+            vertices = data.vertices;
+            draw();
         }
+
+        async function handleClick(event) {
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const response = await fetch('/click', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ x, y })
+            });
+            const data = await response.json();
+            hexagons = data.hexagons;
+            vertices = data.vertices;
+            draw();
+        }
+
+        function draw() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw hexagons
+            hexagons.forEach(hexagon => {
+                drawHexagon(ctx, hexagon.vertices, hexagon.color);
+            });
+
+            // Draw unique vertices
+            vertices.forEach(vertex => {
+                drawVertex(ctx, vertex.x, vertex.y, vertex.radius, vertex.color)
+            });
+        }
+
+        function drawHexagon(ctx, vertices, color) {
+            ctx.beginPath();
+            vertices.forEach(([x, y], index) => {
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+        }
+
+        function drawVertex(ctx, x, y, radius, color) {
+            ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.stroke();
+        }
+
+        window.onload = () => {
+            document.getElementById('canvas').addEventListener('click', handleClick);
+        };
     </script>
 </head>
 <body>
-    <h1 id="textToChange">Click the button to change this text</h1>
-    <button onclick="changeText()">Change Text</button>
+    <h1>Hexagon Layout Generator</h1>
+    <form onsubmit="generateHexagons(event)">
+        <button type="submit">Generate Hexagons</button>
+    </form>
+    <canvas id="canvas" width="1600" height="600"></canvas>
+    <p id="vertex-info"></p>
 </body>
 </html>
