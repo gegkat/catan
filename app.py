@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from math import cos, sin, pi, sqrt
 from dataclasses import dataclass
 import os
+import random
+from enum import Enum
 
 app = Flask(__name__)
 
@@ -9,9 +11,42 @@ VERTEX_RADIUS = 10
 START_X = 800
 START_Y = 300
 HEXAGON_SIZE = 50
-HEXAGON_COLORS = ("orange", "red")
-VERTEX_COLORS = ("blue", "green")
+VERTEX_COLORS = ("white", "blue", "green", "red", "yellow")
 
+class Resource(Enum):
+    DESERT = (0, '#F4A460') # (Sandy Brown)
+    ORE = (1, '#7D7D7D') # (Dark Gray)
+    SHEEP = (2, '#9ACD32') # (Yellow Green)
+    WOOD = (3, '#228B22') # (Forest Green)
+    BRICK = (4, '#B22222') # (Firebrick)
+    WHEAT = (5, '#FFD700') # (Gold)
+
+    def __init__(self, key, color):
+        self.key = key
+        self.color = color
+
+    def next(self):
+        members = list(self.__class__)
+        index = (members.index(self) + 1) % len(members)
+        return members[index]
+
+def get_resources(N):
+    # Ensure we have exactly one desert
+    resources = [Resource.DESERT]
+
+    # List of other resources
+    order = (Resource.SHEEP, Resource.WOOD, Resource.WHEAT, Resource.BRICK, Resource.ORE)
+
+    for i in range(N-1):
+        resources.append(order[i % len(order)])
+
+    # Shuffle the list to randomize the order
+    random.shuffle(resources)
+
+    return resources
+
+def num_hexagons(N):
+    return 1 + 3*(N-1)*N
 
 def deg2rad(x):
     return pi / 180 * x
@@ -43,9 +78,9 @@ class Coordinate:
         return Coordinate(self.q + dq, self.r + dr, self.s + ds)
 
 class Hexagon: 
-    def __init__(self, q, r):
+    def __init__(self, q, r, resource):
         self.coordinate = Coordinate(q, r, -q - r)
-        self.color_index = 0
+        self.resource = resource
 
     def get_pixel(self):
         return self.coordinate.to_pixel()
@@ -67,10 +102,10 @@ class Hexagon:
 
     def toggle_color(self):
         print(self.coordinate)
-        self.color_index += 1
+        self.resource = self.resource.next()
 
     def color(self):
-        return HEXAGON_COLORS[self.color_index % len(HEXAGON_COLORS)]
+        return self.resource.color
     
     def to_dict(self):
         pixels = [c.to_pixel() for c in self.get_vertices_coordinates()]
@@ -104,16 +139,12 @@ class State:
     def __init__(self):
         self.hexagons = []
         self.vertices = []
+
+    def reset(self):
+        self.__init__()
     
-    def calculate_hexagon_positions(self):
+    def update_vertices(self):
         vertex_set = set()
-
-        # Central hexagon
-        N = 10
-        for i in range(-N, N):
-            for j in range(-N, N):
-                self.hexagons.append(Hexagon(i, j))
-
         for hex in self.hexagons:
             for vertex in hex.get_vertices_coordinates():
                 vertex_set.add(vertex)
@@ -121,6 +152,29 @@ class State:
         vertices = list(vertex_set)
         for vertex in vertices:
             self.vertices.append(Vertex(vertex))
+
+    def hexagon_layout(self, N):
+        print('hex layout', N)
+        self.__init__()
+        resources = get_resources(num_hexagons(N))
+        for i in range(-N+1, N):
+            for j in range(-N+1, N):
+                if abs(i + j) >= N:
+                    continue
+                self.hexagons.append(Hexagon(i, j, resources.pop()))
+        assert(len(resources) == 0)
+        self.update_vertices()
+
+    def diamond_layout(self, N):
+        print('diamond layout', N)
+        self.__init__()
+        resources = get_resources((2*N-1)**2)
+        print('num resources', len(resources))
+        for i in range(-N+1, N):
+            for j in range(-N+1, N):
+                self.hexagons.append(Hexagon(i, j, resources.pop()))
+        assert(len(resources) == 0)
+        self.update_vertices()
 
     def handle_click(self, click_pixel):
         # Check if a vertex was clicked
@@ -148,7 +202,20 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    state.calculate_hexagon_positions()
+    action = request.form.get('action')
+    
+    print('action', action)
+    if action == 'hex':
+        state.hexagon_layout(3)
+    elif action == 'big_hex':
+        state.hexagon_layout(4)
+    elif action == 'diamond':
+        state.diamond_layout(3)
+    elif action == 'big_diamond':
+        state.diamond_layout(4)
+    elif action == 'clear':
+        state.reset()
+
     return state.get_json()
 
 @app.route('/click', methods=['POST'])

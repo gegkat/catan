@@ -2,21 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hexagon Generator</title>
+    <title>Sheeps 5eva</title>
     <script>
-        let vertices = [];
-        let hexagons = [];
+        let data = {hexagons: [], vertices: []};
 
-        async function generateHexagons(event) {
+
+        async function generateHex(event, action) {
             event.preventDefault();
-            const response = await fetch('/generate', { method: 'POST' });
-            const data = await response.json();
-            hexagons = data.hexagons;
-            vertices = data.vertices;
-            draw();
+            console.log(`Button clicked: ${action}`);
+
+            const formData = new FormData();
+            formData.append('action', action);
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });            
+                data = await response.json();
+                console.log('Data parsed from generateHex:', data);
+                draw();
+            } catch(error) {
+                console.error('Error during fetch:', error);
+            }
         }
 
         async function handleClick(event) {
+            console.log(`Handling click: ${event}`);
+
             const canvas = document.getElementById('canvas');
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
@@ -29,24 +42,25 @@
                 },
                 body: JSON.stringify({ x, y })
             });
-            const data = await response.json();
-            hexagons = data.hexagons;
-            vertices = data.vertices;
+            data = await response.json();
+            console.log('Data parsed from handleClick:', data);
             draw();
         }
 
         function draw() {
+            console.log('Data received by draw:', data);
+
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Draw hexagons
-            hexagons.forEach(hexagon => {
+            data.hexagons.forEach(hexagon => {
                 drawHexagon(ctx, hexagon.vertices, hexagon.color);
             });
 
             // Draw unique vertices
-            vertices.forEach(vertex => {
+            data.vertices.forEach(vertex => {
                 drawVertex(ctx, vertex.x, vertex.y, vertex.radius, vertex.color)
             });
         }
@@ -81,10 +95,20 @@
     </script>
 </head>
 <body>
-    <h1>Hexagon Layout Generator</h1>
-    <form onsubmit="generateHexagons(event)">
-        <button type="submit">Generate Hexagons</button>
+    <h1>Sheeps 5eva</h1>
+    <!-- <form onsubmit="generateHex(event)">
+        <button name="hex" type="submit">Hex</button>
+        <button name="big_hex" type="submit">Big Hex</button>
+    </form> -->
+
+    <form id="hex-form" onsubmit="generateHex(event)">
+        <button type="submit" onclick="generateHex(event, 'clear')">Clear</button>
+        <button type="submit" onclick="generateHex(event, 'hex')">Hex</button>
+        <button type="submit" onclick="generateHex(event, 'big_hex')">Big Hex</button>
+        <button type="submit" onclick="generateHex(event, 'diamond')">Diamond</button>
+        <button type="submit" onclick="generateHex(event, 'big_diamond')">Big Diamond</button>
     </form>
+
     <canvas id="canvas" width="1600" height="600"></canvas>
     <p id="vertex-info"></p>
 </body>
