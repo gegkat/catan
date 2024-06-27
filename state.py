@@ -1,6 +1,7 @@
 import flask
 import hexagon
 import copy
+from typing import Any
 
 class State:
     def __init__(self) -> None:
@@ -62,7 +63,9 @@ class State:
             self.history.append(self.copy_state())
             self.hexagons, self.vertices = self.future.pop()
 
-    def get_json(self) -> flask.Response:
+    def serialize(self, socketio) -> flask.Response:
         hexagon_dicts = [hex.to_dict() for hex in self.hexagons]
         vertices_dicts = [v.to_dict() for v in self.vertices]
-        return flask.jsonify(hexagons=hexagon_dicts, vertices=vertices_dicts)
+        state_as_dict = {'hexagons': hexagon_dicts, 'vertices': vertices_dicts}
+        socketio.emit('state_update', state_as_dict)
+        return flask.jsonify(state_as_dict)

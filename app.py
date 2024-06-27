@@ -1,11 +1,17 @@
 import flask
+import flask_socketio
 import hexagon
 import board_layout
 import state
 import os
+import eventlet
+eventlet.monkey_patch()  # Make sure eventlet monkey patches for compatibility
+
 
 app = flask.Flask(__name__)
-    
+app.config['SECRET_KEY'] = 'secret!'
+socketio = flask_socketio.SocketIO(app, cors_allowed_origins="*")
+
 # Global state holds all info for the current game.
 game_state = state.State()
 
@@ -30,15 +36,21 @@ def generate():
     elif action == 'forward':
         game_state.forward()
 
-    return game_state.get_json()
+    return game_state.serialize(socketio)
 
 @app.route('/click', methods=['POST'])
 def handle_click():
     data = flask.request.json
     game_state.handle_click(hexagon.Pixel(data['x'], data['y']))
-    return game_state.get_json()
+
+    return game_state.serialize(socketio)
+
+@socketio.on('connect')
+def handle_connect():
+    return game_state.serialize(socketio)
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug_mode = os.environ.get('DEBUG', 'false').lower() == 'true'
-    app.run(host='0.0.0.0', port=port, debug=debug_mode)
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode)

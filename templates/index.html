@@ -4,9 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Sheeps 5eva</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
         let data = { hexagons: [], vertices: [] };
+        const socket = io();
 
+        socket.on('state_update', (newData) => {
+            console.log('Received state update:', newData);
+            data = newData;
+            draw();
+        });
 
         async function handleButton(event, action) {
             event.preventDefault();
