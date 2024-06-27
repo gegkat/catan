@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Sheeps 5eva</title>
     <script>
-        let data = {hexagons: [], vertices: []};
+        let data = { hexagons: [], vertices: [] };
 
 
         async function generateHex(event, action) {
@@ -18,11 +19,11 @@
                 const response = await fetch('/generate', {
                     method: 'POST',
                     body: formData
-                });            
+                });
                 data = await response.json();
                 console.log('Data parsed from generateHex:', data);
                 draw();
-            } catch(error) {
+            } catch (error) {
                 console.error('Error during fetch:', error);
             }
         }
@@ -83,10 +84,10 @@
 
         function drawVertex(ctx, x, y, radius, color) {
             ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * Math.PI);
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.stroke();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.stroke();
         }
 
         window.onload = () => {
@@ -94,15 +95,11 @@
         };
     </script>
 </head>
+
 <body>
     <h1>Sheeps 5eva</h1>
-    <!-- <form onsubmit="generateHex(event)">
-        <button name="hex" type="submit">Hex</button>
-        <button name="big_hex" type="submit">Big Hex</button>
-    </form> -->
 
     <form id="hex-form" onsubmit="generateHex(event)">
-        <button type="submit" onclick="generateHex(event, 'clear')">Clear</button>
         <button type="submit" onclick="generateHex(event, 'hex')">Hex</button>
         <button type="submit" onclick="generateHex(event, 'big_hex')">Big Hex</button>
         <button type="submit" onclick="generateHex(event, 'diamond')">Diamond</button>
@@ -112,4 +109,5 @@
     <canvas id="canvas" width="1600" height="600"></canvas>
     <p id="vertex-info"></p>
 </body>
+
 </html>
