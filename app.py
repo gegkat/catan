@@ -25,6 +25,10 @@ def generate():
         game_state.update_hexagons(board_layout.diamond_layout(3))
     elif action == 'big_diamond':
         game_state.update_hexagons(board_layout.diamond_layout(4))
+    elif action == 'back':
+        game_state.back()
+    elif action == 'forward':
+        game_state.forward()
 
     return game_state.get_json()
 

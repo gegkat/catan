@@ -8,7 +8,7 @@
         let data = { hexagons: [], vertices: [] };
 
 
-        async function generateHex(event, action) {
+        async function handleButton(event, action) {
             event.preventDefault();
             console.log(`Button clicked: ${action}`);
 
@@ -21,7 +21,7 @@
                     body: formData
                 });
                 data = await response.json();
-                console.log('Data parsed from generateHex:', data);
+                console.log('Data parsed from handleButton:', data);
                 draw();
             } catch (error) {
                 console.error('Error during fetch:', error);
@@ -99,11 +99,13 @@
 <body>
     <h1>Sheeps 5eva</h1>
 
-    <form id="hex-form" onsubmit="generateHex(event)">
-        <button type="submit" onclick="generateHex(event, 'hex')">Hex</button>
-        <button type="submit" onclick="generateHex(event, 'big_hex')">Big Hex</button>
-        <button type="submit" onclick="generateHex(event, 'diamond')">Diamond</button>
-        <button type="submit" onclick="generateHex(event, 'big_diamond')">Big Diamond</button>
+    <form id="hex-form" onsubmit="handleButton(event)">
+        <button type="submit" onclick="handleButton(event, 'hex')">Hex</button>
+        <button type="submit" onclick="handleButton(event, 'big_hex')">Big Hex</button>
+        <button type="submit" onclick="handleButton(event, 'diamond')">Diamond</button>
+        <button type="submit" onclick="handleButton(event, 'big_diamond')">Big Diamond</button>
+        <button type="submit" onclick="handleButton(event, 'back')">Back</button>
+        <button type="submit" onclick="handleButton(event, 'forward')">Forward</button>
     </form>
 
     <canvas id="canvas" width="1600" height="600"></canvas>
