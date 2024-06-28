@@ -38,12 +38,12 @@ class State:
         self.hexagons = hexagons
         self.update_vertices()
 
-    def handle_click(self, click_pixel: hexagon.Pixel) -> None:
+    def handle_click(self, click_pixel: hexagon.Pixel, color: str) -> None:
         # Check if a vertex was clicked
         for vertex in self.vertices:
             if vertex.inside(click_pixel):
                 self.save_state()
-                vertex.toggle_color()
+                vertex.toggle_color(color)
                 return 
 
         # Check if a hexagon was clicked

@@ -38,6 +38,10 @@
         async function handleClick(event) {
             console.log(`Handling click: ${event}`);
 
+            const selectedColor = document.getElementById('color-select').value;
+
+            console.log(`Handling click: ${selectedColor}`);
+
             const canvas = document.getElementById('canvas');
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
@@ -48,7 +52,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ x, y })
+                body: JSON.stringify({ x, y, selectedColor })
             });
             data = await response.json();
             console.log('Data parsed from handleClick:', data);
@@ -114,6 +118,14 @@
         <button type="submit" onclick="handleButton(event, 'back')">Back</button>
         <button type="submit" onclick="handleButton(event, 'forward')">Forward</button>
     </form>
+
+    <label for="color-select">Choose your color:</label>
+    <select id="color-select">
+        <option value="red">Red</option>
+        <option value="blue">Blue</option>
+        <option value="green">Green</option>
+        <option value="yellow">Yellow</option>
+    </select>
 
     <canvas id="canvas" width="1600" height="600"></canvas>
     <p id="vertex-info"></p>

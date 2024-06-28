@@ -9,7 +9,6 @@ VERTEX_RADIUS = 8
 START_X = 400
 START_Y = 200
 HEXAGON_SIZE = 30
-VERTEX_COLORS = ("white", "blue", "green", "red", "yellow")
 
 class Resource(Enum):
     DESERT = (0, '#F4A460') # (Sandy Brown)
@@ -123,7 +122,7 @@ class Hexagon:
 class Vertex: 
     def __init__(self, coordinate: Coordinate) -> None:
         self.coordinate = coordinate
-        self.color_index = 0
+        self.color = 'white'
 
     def get_pixel(self) -> Pixel:
         return self.coordinate.to_pixel()
@@ -131,12 +130,12 @@ class Vertex:
     def inside(self, pixel: Pixel) -> bool:
         return pixel.distance(self.get_pixel()) < VERTEX_RADIUS
 
-    def toggle_color(self) -> None:
-        self.color_index += 1
-
-    def color(self) -> str:
-        return VERTEX_COLORS[self.color_index % len(VERTEX_COLORS)]
+    def toggle_color(self, color) -> None:
+        if self.color == color:
+            self.color = 'white'
+        else:
+            self.color = color
     
     def to_dict(self) -> dict[str, Any]:
         pixel = self.get_pixel()
-        return {'x': pixel.x, 'y': pixel.y, 'radius': VERTEX_RADIUS, 'color': self.color()}
+        return {'x': pixel.x, 'y': pixel.y, 'radius': VERTEX_RADIUS, 'color': self.color}

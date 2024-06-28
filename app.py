@@ -41,8 +41,7 @@ def generate():
 @app.route('/click', methods=['POST'])
 def handle_click():
     data = flask.request.json
-    game_state.handle_click(hexagon.Pixel(data['x'], data['y']))
-
+    game_state.handle_click(hexagon.Pixel(data['x'], data['y']), data['selectedColor'])
     return game_state.serialize(socketio)
 
 @socketio.on('connect')
