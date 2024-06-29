@@ -67,7 +67,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             data.hexagons.forEach(hexagon => {
-                drawHexagon(ctx, hexagon.vertices, hexagon.color);
+                drawHexagon(ctx, hexagon.center, hexagon.vertices, hexagon.color, hexagon.number);
             });
 
             data.lines.forEach(line => {
@@ -81,7 +81,7 @@
             });
         }
 
-        function drawHexagon(ctx, vertices, color) {
+        function drawHexagon(ctx, center, vertices, color, number) {
             ctx.beginPath();
             vertices.forEach(([x, y], index) => {
                 if (index === 0) {
@@ -96,6 +96,16 @@
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 1;
             ctx.stroke();
+
+            // Draw the number in the center of the hexagon
+            x = center[0]
+            y = center[1]
+            drawVertex(ctx, x, y, 15, '#FFDAB9')
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(number, center[0], center[1]);
         }
 
         function drawVertex(ctx, x, y, radius, color) {

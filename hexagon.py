@@ -34,15 +34,19 @@ def get_resources(num_resources: int) -> list[Resource]:
     '''
     # Ensure we have exactly one desert
     resources = [Resource.DESERT]
+    numbers = [7]
 
     # Fill out list of resources in priority order.
-    priority = (Resource.SHEEP, Resource.WOOD, Resource.WHEAT, 
+    resource_priority = (Resource.SHEEP, Resource.WOOD, Resource.WHEAT, 
              Resource.BRICK, Resource.ORE)
+    number_priority = (6, 8, 5, 9, 4, 10, 3, 11, 2, 12)
     for i in range(num_resources-1):
-        resources.append(priority[i % len(priority)])
+        resources.append(resource_priority[i % len(resource_priority)])
+        numbers.append(number_priority[i % len(number_priority)])
 
     random.shuffle(resources)
-    return resources
+    random.shuffle(numbers)
+    return resources, numbers
 
 def deg2rad(x: float) -> float:
     return pi / 180 * x
@@ -96,9 +100,10 @@ class Coordinate:
         return self.q > other.q
 
 class Hexagon: 
-    def __init__(self, q: int, r: int, resource: Resource) -> None:
+    def __init__(self, q: int, r: int, resource: Resource, number: int) -> None:
         self.coordinate = Coordinate(q, r, -q - r)
         self.resource = resource
+        self.number = number
 
     def get_pixel(self) -> Pixel:
         return self.coordinate.to_pixel()
@@ -126,7 +131,10 @@ class Hexagon:
     
     def to_dict(self) -> dict:
         pixels = [c.to_pixel() for c in self.get_vertices_coordinates()]
+        center = self.coordinate.to_pixel()
         return {'vertices':[(p.x, p.y) for p in pixels], 
+                'center': (center.x, center.y),
+                'number': self.number,
                 'color': self.color()}
 
     
