@@ -6,7 +6,7 @@
     <title>Sheeps 5eva</title>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        let data = { hexagons: [], vertices: [] };
+        let data = { hexagons: [], vertices: [], lines: [] };
         const socket = io();
 
         socket.on('state_update', (newData) => {
@@ -66,12 +66,16 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw hexagons
             data.hexagons.forEach(hexagon => {
                 drawHexagon(ctx, hexagon.vertices, hexagon.color);
             });
 
-            // Draw unique vertices
+            data.lines.forEach(line => {
+                drawLine(ctx, line.x1, line.y1, line.x2, line.y2,
+                    line.x3, line.y3, line.x4, line.y4,
+                    line.width, line.color)
+            });
+
             data.vertices.forEach(vertex => {
                 drawVertex(ctx, vertex.x, vertex.y, vertex.radius, vertex.color)
             });
@@ -90,6 +94,7 @@
             ctx.fillStyle = color;
             ctx.fill();
             ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
             ctx.stroke();
         }
 
@@ -98,7 +103,24 @@
             ctx.arc(x, y, radius, 0, 2 * Math.PI);
             ctx.fillStyle = color;
             ctx.fill();
-            ctx.stroke();
+            // ctx.lineWidth = 1;
+            // ctx.strokeStyle = 'black';
+            // ctx.stroke();
+        }
+
+        function drawLine(ctx, x1, y1, x2, y2, x3, y3, x4, y4, width, color) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.lineTo(x3, y3);
+            ctx.lineTo(x4, y4);
+            ctx.closePath();
+
+            ctx.fillStyle = color;
+            ctx.fill();
+            // ctx.strokeStyle = 'white';
+            // ctx.lineWidth = 2;
+            // ctx.stroke();
         }
 
         window.onload = () => {
@@ -121,10 +143,10 @@
 
     <label for="color-select">Choose your color:</label>
     <select id="color-select">
-        <option value="red">Red</option>
+        <option value="cyan">Cyan</option>
+        <option value="magenta">Magenta</option>
+        <option value="purple">Purple</option>
         <option value="blue">Blue</option>
-        <option value="green">Green</option>
-        <option value="yellow">Yellow</option>
     </select>
 
     <canvas id="canvas" width="1600" height="600"></canvas>

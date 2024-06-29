@@ -5,10 +5,11 @@ from math import pi, sqrt
 from typing import Any
 
 
-VERTEX_RADIUS = 8
+VERTEX_RADIUS = 12
 START_X = 400
 START_Y = 200
-HEXAGON_SIZE = 30
+HEXAGON_SIZE = 45
+LINE_WIDTH = 8
 
 class Resource(Enum):
     DESERT = (0, '#F4A460') # (Sandy Brown)
@@ -55,6 +56,9 @@ class Pixel:
         dx = self.x - other.x
         dy = self.y - other.y
         return sqrt(dx*dx + dy*dy)
+    
+def cross_product(p0: 'Pixel', p1: 'Pixel', p2: 'Pixel') -> float:
+    return (p0.x - p1.x) * (p2.y - p1.y) - (p0.y - p1.y) * (p2.x - p1.x)
 
 @dataclass(frozen=True, eq=True)
 class Coordinate:
@@ -83,6 +87,13 @@ class Coordinate:
     
     def add(self, dq: int, dr: int, ds: int) -> 'Coordinate':
         return Coordinate(self.q + dq, self.r + dr, self.s + ds)
+    
+    def greater(self, other: 'Coordinate') -> bool:
+        if self.q == other.q:
+            if self.r == other.r:
+                return self.s > other.s
+            return self.r > other.r
+        return self.q > other.q
 
 class Hexagon: 
     def __init__(self, q: int, r: int, resource: Resource) -> None:
@@ -122,7 +133,7 @@ class Hexagon:
 class Vertex: 
     def __init__(self, coordinate: Coordinate) -> None:
         self.coordinate = coordinate
-        self.color = 'white'
+        self.color = 'rgba(255, 255, 255, 0)'
 
     def get_pixel(self) -> Pixel:
         return self.coordinate.to_pixel()
@@ -132,10 +143,70 @@ class Vertex:
 
     def toggle_color(self, color) -> None:
         if self.color == color:
-            self.color = 'white'
+            self.color = 'rgba(255, 255, 255, 0)'
         else:
             self.color = color
     
     def to_dict(self) -> dict[str, Any]:
         pixel = self.get_pixel()
         return {'x': pixel.x, 'y': pixel.y, 'radius': VERTEX_RADIUS, 'color': self.color}
+    
+class Line:
+    def __init__(self, start: Coordinate, end: Coordinate) -> None:
+        self.start = start.to_pixel()
+        self.end = end.to_pixel()
+        self.color = 'rgba(255, 255, 255, 0)'
+        self.width = LINE_WIDTH
+
+    # def inside(self, pixel: Pixel) -> bool:
+    #     pixel1 = self.start.to_pixel()
+    #     pixel2 = self.end.to_pixel()
+    #     midpoint = Pixel((pixel1.x + pixel2.x) / 2, 
+    #                      (pixel1.y + pixel2.y) / 2)
+    #     return pixel.distance(midpoint) < VERTEX_RADIUS
+    
+    def unit_direction(self) -> Pixel:
+        length = self.length()
+        return Pixel((self.end.x - self.start.x) / length, 
+                     (self.end.y - self.start.y) / length)
+    
+    def length(self) -> float:
+        return self.start.distance(self.end)
+
+    def get_corners(self) -> tuple[Pixel, Pixel, Pixel, Pixel]:
+
+        # Calculate direction vector
+        direction = self.unit_direction()
+
+        # Calculate perpendicular vector and normalize to half the width
+        offsetX = (-direction.y * self.width) / 2
+        offsetY = (direction.x * self.width) / 2
+
+        # Calculate rectangle corners
+        A = Pixel(self.start.x + offsetX, self.start.y + offsetY)
+        B = Pixel(self.start.x - offsetX, self.start.y - offsetY)
+        C = Pixel(self.end.x + offsetX, self.end.y + offsetY)
+        D = Pixel(self.end.x - offsetX, self.end.y - offsetY)
+        return (A, B, C, D)
+
+    def inside(self, pixel: Pixel):
+        A, B, C, D = self.get_corners()
+        # Check if the point is inside the rectangle using cross products
+        if (cross_product(A, B, pixel) <= 0 and cross_product(B, D, pixel) <= 0 and
+            cross_product(D, C, pixel) <= 0 and cross_product(C, A, pixel) <= 0):
+            return True
+        return False
+
+    def toggle_color(self, color) -> None:
+        if self.color == color:
+            self.color = 'rgba(255, 255, 255, 0)'
+        else:
+            self.color = color
+
+    def to_dict(self) -> dict[str, Any]:
+        A, B, C, D = self.get_corners()
+        return {'x1': A.x, 'y1': A.y, 
+                'x2': B.x, 'y2': B.y, 
+                'x3': D.x, 'y3': D.y, 
+                'x4': C.x, 'y4': C.y, 
+                'width': self.width, 'color': self.color}
