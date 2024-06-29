@@ -6,8 +6,8 @@ from typing import Any
 
 
 VERTEX_RADIUS = 12
-START_X = 400
-START_Y = 200
+START_X = 500
+START_Y = 300
 HEXAGON_SIZE = 45
 LINE_WIDTH = 8
 
@@ -28,25 +28,25 @@ class Resource(Enum):
         index = (members.index(self) + 1) % len(members)
         return members[index]
 
-def get_resources(num_resources: int) -> list[Resource]:
+def get_resources(num_resources: int) -> list[tuple[Resource, int]]:
     ''' Generates a shuffled list of resources. Will include exactly 
     one desert and approximately equal amounts of the others.
     '''
     # Ensure we have exactly one desert
-    resources = [Resource.DESERT]
-    numbers = [7]
+    resources = [(Resource.DESERT, 7)]
 
     # Fill out list of resources in priority order.
     resource_priority = (Resource.SHEEP, Resource.WOOD, Resource.WHEAT, 
              Resource.BRICK, Resource.ORE)
     number_priority = (6, 8, 5, 9, 4, 10, 3, 11, 2, 12)
     for i in range(num_resources-1):
-        resources.append(resource_priority[i % len(resource_priority)])
-        numbers.append(number_priority[i % len(number_priority)])
+        resource = resource_priority[i % len(resource_priority)]
+        number = number_priority[i % len(number_priority)]
+        resources.append((resource, number))
 
     random.shuffle(resources)
-    random.shuffle(numbers)
-    return resources, numbers
+
+    return resources
 
 def deg2rad(x: float) -> float:
     return pi / 180 * x
@@ -100,10 +100,10 @@ class Coordinate:
         return self.q > other.q
 
 class Hexagon: 
-    def __init__(self, q: int, r: int, resource: Resource, number: int) -> None:
+    def __init__(self, q: int, r: int, resource: tuple[Resource, int]) -> None:
         self.coordinate = Coordinate(q, r, -q - r)
-        self.resource = resource
-        self.number = number
+        self.resource = resource[0]
+        self.number = resource[1]
 
     def get_pixel(self) -> Pixel:
         return self.coordinate.to_pixel()

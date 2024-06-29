@@ -65,6 +65,8 @@
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'gray';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             data.hexagons.forEach(hexagon => {
                 drawHexagon(ctx, hexagon.center, hexagon.vertices, hexagon.color, hexagon.number);
@@ -98,14 +100,16 @@
             ctx.stroke();
 
             // Draw the number in the center of the hexagon
-            x = center[0]
-            y = center[1]
-            drawVertex(ctx, x, y, 15, '#FFDAB9')
-            ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(number, center[0], center[1]);
+            if (number != 7) {
+                x = center[0]
+                y = center[1]
+                drawVertex(ctx, x, y, 15, '#FFDAB9')
+                ctx.fillStyle = 'black';
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(number, center[0], center[1]);
+            }
         }
 
         function drawVertex(ctx, x, y, radius, color) {
@@ -158,8 +162,9 @@
         <option value="purple">Purple</option>
         <option value="blue">Blue</option>
     </select>
-
-    <canvas id="canvas" width="1600" height="600"></canvas>
+    <br>
+    <br>
+    <canvas id="canvas" width="1000" height="600"></canvas>
     <p id="vertex-info"></p>
 </body>
 
