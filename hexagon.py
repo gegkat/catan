@@ -7,8 +7,7 @@ from typing import Any
 
 VERTEX_RADIUS = 12
 START_X = 500
-START_Y = 300
-HEXAGON_SIZE = 45
+START_Y = 250
 LINE_WIDTH = 8
 
 class Resource(Enum):
@@ -70,7 +69,7 @@ class Coordinate:
     r: int
     s: int
 
-    def to_pixel(self) -> Pixel:
+    def to_pixel(self, size) -> Pixel:
         ''' We use cube coordinates here. 
         q points toward 2 on a clock.
         r points toward 6 on a clock.
@@ -85,8 +84,8 @@ class Coordinate:
         '''
         dx = (self.q - self.s) * sqrt(3) / 2
         dy = self.r - (self.q + self.s) / 2
-        x = START_X + HEXAGON_SIZE * dx
-        y = START_Y + HEXAGON_SIZE * dy
+        x = START_X + size * dx
+        y = START_Y + size * dy
         return Pixel(x, y)
     
     def add(self, dq: int, dr: int, ds: int) -> 'Coordinate':
@@ -100,13 +99,14 @@ class Coordinate:
         return self.q > other.q
 
 class Hexagon: 
-    def __init__(self, q: int, r: int, resource: tuple[Resource, int]) -> None:
+    def __init__(self, q: int, r: int, resource: tuple[Resource, int], size: int) -> None:
         self.coordinate = Coordinate(q, r, -q - r)
         self.resource = resource[0]
         self.number = resource[1]
+        self.size = size
 
     def get_pixel(self) -> Pixel:
-        return self.coordinate.to_pixel()
+        return self.coordinate.to_pixel(self.size)
 
     def get_vertices_coordinates(self) -> tuple[Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate]:
         # clockwise starting with +q
@@ -121,7 +121,7 @@ class Hexagon:
     
     # This is approximate. This checks if we are inside the inner circle.
     def inside(self, pixel: Pixel) -> bool:
-        return pixel.distance(self.get_pixel()) < HEXAGON_SIZE * sqrt(3) / 2
+        return pixel.distance(self.get_pixel()) < self.size * sqrt(3) / 2
 
     def toggle_color(self) -> None:
         self.resource = self.resource.next()
@@ -130,8 +130,8 @@ class Hexagon:
         return self.resource.color
     
     def to_dict(self) -> dict:
-        pixels = [c.to_pixel() for c in self.get_vertices_coordinates()]
-        center = self.coordinate.to_pixel()
+        pixels = [c.to_pixel(self.size) for c in self.get_vertices_coordinates()]
+        center = self.coordinate.to_pixel(self.size)
         return {'vertices':[(p.x, p.y) for p in pixels], 
                 'center': (center.x, center.y),
                 'number': self.number,
@@ -139,15 +139,12 @@ class Hexagon:
 
     
 class Vertex: 
-    def __init__(self, coordinate: Coordinate) -> None:
-        self.coordinate = coordinate
+    def __init__(self, pixel: Pixel) -> None:
+        self.pixel = pixel
         self.color = 'rgba(255, 255, 255, 0)'
-
-    def get_pixel(self) -> Pixel:
-        return self.coordinate.to_pixel()
     
     def inside(self, pixel: Pixel) -> bool:
-        return pixel.distance(self.get_pixel()) < VERTEX_RADIUS
+        return pixel.distance(self.pixel) < VERTEX_RADIUS
 
     def toggle_color(self, color) -> None:
         if self.color == color:
@@ -156,13 +153,12 @@ class Vertex:
             self.color = color
     
     def to_dict(self) -> dict[str, Any]:
-        pixel = self.get_pixel()
-        return {'x': pixel.x, 'y': pixel.y, 'radius': VERTEX_RADIUS, 'color': self.color}
+        return {'x': self.pixel.x, 'y': self.pixel.y, 'radius': VERTEX_RADIUS, 'color': self.color}
     
 class Line:
-    def __init__(self, start: Coordinate, end: Coordinate) -> None:
-        self.start = start.to_pixel()
-        self.end = end.to_pixel()
+    def __init__(self, start: Pixel, end: Pixel) -> None:
+        self.start = start
+        self.end = end
         self.color = 'rgba(255, 255, 255, 0)'
         self.width = LINE_WIDTH
 

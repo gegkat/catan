@@ -60,17 +60,19 @@ class State:
 
     def update_vertices(self) -> None:
         coord_set = set()
+        size = 0
         for hex in self.hexagons:
             for coord in hex.get_vertices_coordinates():
                 coord_set.add(coord)
+                size = hex.size
 
         for coord in coord_set:
-            self.vertices.append(hexagon.Vertex(coord))
+            self.vertices.append(hexagon.Vertex(coord.to_pixel(size)))
 
         for coord in coord_set:
             for neighbor in self.get_neighbors(coord):
                 if neighbor in coord_set and neighbor.greater(coord):
-                    self.lines.append(hexagon.Line(coord, neighbor))
+                    self.lines.append(hexagon.Line(coord.to_pixel(size), neighbor.to_pixel(size)))
 
         # if len(self.lines) > 1:
         #     self.lines = [self.lines[0]]
@@ -85,7 +87,6 @@ class State:
     def handle_click(self, click_pixel: hexagon.Pixel, color: str) -> None:
         for vertex in self.vertices:
             if vertex.inside(click_pixel):
-                print('Vertex: ', vertex.coordinate)
                 self.save_state()
                 vertex.toggle_color(color)
                 return 
