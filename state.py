@@ -95,12 +95,6 @@ class State:
                 self.save_state()
                 line.toggle_color(color)
                 return 
-            
-        # for hex in self.hexagons:
-        #     if hex.inside(click_pixel):
-        #         self.save_state()
-        #         hex.toggle_color()
-        #         return 
         
     def back(self) -> None:
         if self.history:

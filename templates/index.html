@@ -35,71 +35,49 @@
         const socket = io();
 
         socket.on('state_update', (newData) => {
-            // console.log('Received state update:', newData);
             data = newData;
-            const selectedColor = document.getElementById('color-select').value;
-            draw(selectedColor);
+            draw();
         });
 
         document.addEventListener('DOMContentLoaded', function () {
             const colorSelect = document.getElementById('color-select');
-
             colorSelect.addEventListener('change', function () {
-                const selectedColor = this.value;
-                console.log('You selected: ' + selectedColor);  // Replace this with your desired action
-                draw(selectedColor);
+                draw();
             });
         });
 
-        async function handleButton(event, action) {
+        async function handleEvent(event, action = null) {
             event.preventDefault();
-            // console.log(`Button clicked: ${action}`);
+            const color = document.getElementById('color-select').value;
+            let x = null, y = null;
 
-            const selectedColor = document.getElementById('color-select').value;
-
-            const formData = new FormData();
-            formData.append('action', action);
-            formData.append('color', selectedColor);
-
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    body: formData
-                });
-                data = await response.json();
-                // console.log('Data parsed from handleButton:', data);
-                draw(selectedColor);
-            } catch (error) {
-                console.error('Error during fetch:', error);
+            // Determine if the source is the canvas and get coordinates
+            if (event.target.id === 'canvas') {
+                const rect = event.target.getBoundingClientRect();
+                x = event.clientX - rect.left;
+                y = event.clientY - rect.top;
             }
-        }
 
-        async function handleClick(event) {
-            // console.log(`Handling click: ${event}`);
+            const body = JSON.stringify({
+                action,
+                color,
+                x,
+                y
+            });
 
-            const selectedColor = document.getElementById('color-select').value;
-
-            // console.log(`Handling click: ${selectedColor}`);
-
-            const canvas = document.getElementById('canvas');
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const response = await fetch('/click', {
+            const response = await fetch('/event', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ x, y, selectedColor })
+                headers: { 'Content-Type': 'application/json' },
+                body: body
             });
             data = await response.json();
-            // console.log('Data parsed from handleClick:', data);
-            draw(selectedColor);
+            draw();
         }
 
-        function draw(color) {
+        function draw() {
             console.log('Data received by draw:', data);
+
+            const color = document.getElementById('color-select').value;
 
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -133,7 +111,7 @@
         }
 
         window.onload = () => {
-            document.getElementById('canvas').addEventListener('click', handleClick);
+            document.getElementById('canvas').addEventListener('click', (event) => handleEvent(event, 'click'));
         };
     </script>
 </head>
@@ -141,13 +119,13 @@
 <body>
     <h1>Sheeps 5eva</h1>
 
-    <form id="hex-form" onsubmit="handleButton(event)">
-        <button type="submit" onclick="handleButton(event, 'hex')">Hex</button>
-        <button type="submit" onclick="handleButton(event, 'big_hex')">Big Hex</button>
-        <button type="submit" onclick="handleButton(event, 'diamond')">Diamond</button>
-        <button type="submit" onclick="handleButton(event, 'big_diamond')">Big Diamond</button>
-        <button type="submit" onclick="handleButton(event, 'back')">Back</button>
-        <button type="submit" onclick="handleButton(event, 'forward')">Forward</button>
+    <form id="hex-form" onsubmit="handleEvent(event)">
+        <button type="submit" onclick="handleEvent(event, 'hex')">Hex</button>
+        <button type="submit" onclick="handleEvent(event, 'big_hex')">Big Hex</button>
+        <button type="submit" onclick="handleEvent(event, 'diamond')">Diamond</button>
+        <button type="submit" onclick="handleEvent(event, 'big_diamond')">Big Diamond</button>
+        <button type="submit" onclick="handleEvent(event, 'back')">Back</button>
+        <button type="submit" onclick="handleEvent(event, 'forward')">Forward</button>
     </form>
 
     <label for="color-select">Choose your color:</label>
@@ -162,35 +140,35 @@
     <br>
 
     <div class="dice">
-        <button type="submit" onclick="handleButton(event, 'roll')">Roll Dice</button>
+        <button type="submit" onclick="handleEvent(event, 'roll')">Roll Dice</button>
         <span class="dice">Dice: <span id="dice">0 0</span></span>
     </div>
 
     <br>
 
     <div class="resource-row">
-        <button onclick="handleButton(event, 'ore-dec')">-1</button>
-        <button onclick="handleButton(event, 'ore-inc')">+1</button>
+        <button onclick="handleEvent(event, 'ore-dec')">-1</button>
+        <button onclick="handleEvent(event, 'ore-inc')">+1</button>
         <span class="resource-label">Ore: <span id="ore">0</span></span>
     </div>
     <div class="resource-row">
-        <button onclick="handleButton(event, 'brick-dec')">-1</button>
-        <button onclick="handleButton(event, 'brick-inc')">+1</button>
+        <button onclick="handleEvent(event, 'brick-dec')">-1</button>
+        <button onclick="handleEvent(event, 'brick-inc')">+1</button>
         <span class="resource-label">Brick: <span id="brick">0</span></span>
     </div>
     <div class="resource-row">
-        <button onclick="handleButton(event, 'wheat-dec')">-1</button>
-        <button onclick="handleButton(event, 'wheat-inc')">+1</button>
+        <button onclick="handleEvent(event, 'wheat-dec')">-1</button>
+        <button onclick="handleEvent(event, 'wheat-inc')">+1</button>
         <span class="resource-label">Wheat: <span id="wheat">0</span></span>
     </div>
     <div class="resource-row">
-        <button onclick="handleButton(event, 'sheep-dec')">-1</button>
-        <button onclick="handleButton(event, 'sheep-inc')">+1</button>
+        <button onclick="handleEvent(event, 'sheep-dec')">-1</button>
+        <button onclick="handleEvent(event, 'sheep-inc')">+1</button>
         <span class="resource-label">Sheep: <span id="sheep">0</span></span>
     </div>
     <div class="resource-row">
-        <button onclick="handleButton(event, 'wood-dec')">-1</button>
-        <button onclick="handleButton(event, 'wood-inc')">+1</button>
+        <button onclick="handleEvent(event, 'wood-dec')">-1</button>
+        <button onclick="handleEvent(event, 'wood-inc')">+1</button>
         <span class="resource-label">Wood: <span id="wood">0</span></span>
     </div>
 
