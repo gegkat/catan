@@ -18,27 +18,20 @@ class Player:
 
 class State:
     def __init__(self) -> None:
-        self.hexagons = []
-        self.vertices = []
-        self.lines = []
-        self.players = {'cyan': Player(), 
-                        'magenta': Player(),
-                        'purple': Player(),
-                        'blue': Player(),
-                        }
-        self.dice = (0, 0)
+        self.reset()
         self.history = []
         self.future = []
 
     def roll_dice(self):
+        self.save_state()
         self.dice = (random.randint(1, 6), random.randint(1, 6))
-        print(self.dice)
 
     def update_resource(self, resource: str, delta: int, color: str):
+        self.save_state()
         self.players[color].update_resource(resource, delta)
 
     def copy_state(self) -> tuple[list[hexagon.Hexagon], list[hexagon.Vertex]]:
-        return copy.deepcopy((self.hexagons, self.vertices, self.lines))
+        return copy.deepcopy((self.hexagons, self.vertices, self.lines, self.players, self.dice))
 
     def save_state(self) -> None:
         self.history.append(self.copy_state())
@@ -48,6 +41,12 @@ class State:
         self.hexagons = []
         self.vertices = []
         self.lines = []
+        self.players = {'cyan': Player(), 
+                        'magenta': Player(),
+                        'purple': Player(),
+                        'blue': Player(),
+                        }
+        self.dice = (0, 0)
 
     def get_neighbors(self, coord: hexagon.Coordinate) -> tuple[hexagon.Coordinate, hexagon.Coordinate, hexagon.Coordinate]:
         return (coord.add(1, 0, 1), coord.add(1, 1, 0), coord.add(0, 1, 1))
@@ -99,12 +98,12 @@ class State:
     def back(self) -> None:
         if self.history:
             self.future.append(self.copy_state())
-            self.hexagons, self.vertices, self.lines = self.history.pop()
+            self.hexagons, self.vertices, self.lines, self.players, self.dice = self.history.pop()
 
     def forward(self) -> None:
         if self.future:
             self.history.append(self.copy_state())
-            self.hexagons, self.vertices, self.lines = self.future.pop()
+            self.hexagons, self.vertices, self.lines, self.players, self.dice = self.future.pop()
 
     def serialize(self, socketio) -> flask.Response:
         hexagon_dicts = [hex.to_dict() for hex in self.hexagons]
