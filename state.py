@@ -3,13 +3,34 @@ import hexagon
 import copy
 from typing import Any
 
+class Player:
+    def __init__(self) -> None:
+        self.resources = {
+            'ore': 0,
+            'wood': 0,
+            'brick': 0,
+            'wheat': 0,
+            'sheep': 0,
+        }
+    
+    def update_resource(self, resource: str, delta: int):
+        self.resources[resource] = max(0, self.resources[resource] + delta)
+
 class State:
     def __init__(self) -> None:
         self.hexagons = []
         self.vertices = []
         self.lines = []
+        self.players = {'cyan': Player(), 
+                        'magenta': Player(),
+                        'purple': Player(),
+                        'blue': Player(),
+                        }
         self.history = []
         self.future = []
+
+    def update_resource(self, resource: str, delta: int, color: str):
+        self.players[color].update_resource(resource, delta)
 
     def copy_state(self) -> tuple[list[hexagon.Hexagon], list[hexagon.Vertex]]:
         return copy.deepcopy((self.hexagons, self.vertices, self.lines))
@@ -84,6 +105,10 @@ class State:
         hexagon_dicts = [hex.to_dict() for hex in self.hexagons]
         vertices_dicts = [v.to_dict() for v in self.vertices]
         lines_dicts = [l.to_dict() for l in self.lines]
-        state_as_dict = {'hexagons': hexagon_dicts, 'vertices': vertices_dicts, 'lines': lines_dicts}
+        players_dicts = {c: p.resources for c, p in self.players.items()}
+        state_as_dict = {'hexagons': hexagon_dicts, 
+                         'vertices': vertices_dicts, 
+                         'lines': lines_dicts,
+                         'players': players_dicts}
         socketio.emit('state_update', state_as_dict)
         return flask.jsonify(state_as_dict)

@@ -19,9 +19,14 @@ game_state = state.State()
 def home():
     return flask.render_template('index.html')
 
+def parse_resource_action(action: str) -> str:
+    return action.split('-')[0]
+
 @app.route('/generate', methods=['POST'])
 def generate():
     action = flask.request.form.get('action')
+    color = flask.request.form.get('color')
+    print('color', color)
     
     if action == 'hex':
         game_state.update_hexagons(board_layout.hexagon_layout(3))
@@ -35,6 +40,10 @@ def generate():
         game_state.back()
     elif action == 'forward':
         game_state.forward()
+    elif action.endswith('dec'):
+        game_state.update_resource(parse_resource_action(action), -1, color)
+    elif action.endswith('inc'):
+        game_state.update_resource(parse_resource_action(action), 1, color)
 
     return game_state.serialize(socketio)
 

@@ -4,23 +4,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Sheeps 5eva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* Consistent font usage */
+        }
+
+        .resource-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            /* Space between rows */
+        }
+
+        .resource-row button {
+            margin-right: 10px;
+            /* Space between buttons and text */
+        }
+
+        .resource-label {
+            flex-grow: 1;
+            /* Makes the label flexible in taking up remaining space */
+        }
+    </style>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        let data = { hexagons: [], vertices: [], lines: [] };
+        let data = { hexagons: [], vertices: [], lines: [], players: {} };
         const socket = io();
 
         socket.on('state_update', (newData) => {
-            console.log('Received state update:', newData);
+            // console.log('Received state update:', newData);
             data = newData;
-            draw();
+            const selectedColor = document.getElementById('color-select').value;
+            draw(selectedColor);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const colorSelect = document.getElementById('color-select');
+
+            colorSelect.addEventListener('change', function () {
+                const selectedColor = this.value;
+                console.log('You selected: ' + selectedColor);  // Replace this with your desired action
+                draw(selectedColor);
+            });
         });
 
         async function handleButton(event, action) {
             event.preventDefault();
-            console.log(`Button clicked: ${action}`);
+            // console.log(`Button clicked: ${action}`);
+
+            const selectedColor = document.getElementById('color-select').value;
 
             const formData = new FormData();
             formData.append('action', action);
+            formData.append('color', selectedColor);
 
             try {
                 const response = await fetch('/generate', {
@@ -28,19 +65,19 @@
                     body: formData
                 });
                 data = await response.json();
-                console.log('Data parsed from handleButton:', data);
-                draw();
+                // console.log('Data parsed from handleButton:', data);
+                draw(selectedColor);
             } catch (error) {
                 console.error('Error during fetch:', error);
             }
         }
 
         async function handleClick(event) {
-            console.log(`Handling click: ${event}`);
+            // console.log(`Handling click: ${event}`);
 
             const selectedColor = document.getElementById('color-select').value;
 
-            console.log(`Handling click: ${selectedColor}`);
+            // console.log(`Handling click: ${selectedColor}`);
 
             const canvas = document.getElementById('canvas');
             const rect = canvas.getBoundingClientRect();
@@ -55,12 +92,12 @@
                 body: JSON.stringify({ x, y, selectedColor })
             });
             data = await response.json();
-            console.log('Data parsed from handleClick:', data);
-            draw();
+            // console.log('Data parsed from handleClick:', data);
+            draw(selectedColor);
         }
 
-        function draw() {
-            console.log('Data received by draw:', data);
+        function draw(color) {
+            // console.log('Data received by draw:', data);
 
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -81,6 +118,13 @@
             data.vertices.forEach(vertex => {
                 drawVertex(ctx, vertex.x, vertex.y, vertex.radius, vertex.color)
             });
+
+            console.log('players:', color, data.players[color])
+            Object.entries(data.players[color]).forEach(([resource, value]) => {
+                console.log(resource, value)
+                document.getElementById(resource).textContent = value;
+            });
+
         }
 
         function drawHexagon(ctx, center, vertices, color, number) {
@@ -162,7 +206,34 @@
         <option value="purple">Purple</option>
         <option value="blue">Blue</option>
     </select>
-    <br>
+
+    <div class="resource-row">
+        <button onclick="handleButton(event, 'ore-dec')">-1</button>
+        <button onclick="handleButton(event, 'ore-inc')">+1</button>
+        <span class="resource-label">Ore: <span id="ore">0</span></span>
+    </div>
+    <div class="resource-row">
+        <button onclick="handleButton(event, 'brick-dec')">-1</button>
+        <button onclick="handleButton(event, 'brick-inc')">+1</button>
+        <span class="resource-label">Brick: <span id="brick">0</span></span>
+    </div>
+    <div class="resource-row">
+        <button onclick="handleButton(event, 'wheat-dec')">-1</button>
+        <button onclick="handleButton(event, 'wheat-inc')">+1</button>
+        <span class="resource-label">Wheat: <span id="wheat">0</span></span>
+    </div>
+    <div class="resource-row">
+        <button onclick="handleButton(event, 'sheep-dec')">-1</button>
+        <button onclick="handleButton(event, 'sheep-inc')">+1</button>
+        <span class="resource-label">Sheep: <span id="sheep">0</span></span>
+    </div>
+    <div class="resource-row">
+        <button onclick="handleButton(event, 'wood-dec')">-1</button>
+        <button onclick="handleButton(event, 'wood-inc')">+1</button>
+        <span class="resource-label">Wood: <span id="wood">0</span></span>
+    </div>
+
+
     <br>
     <canvas id="canvas" width="1000" height="600"></canvas>
     <p id="vertex-info"></p>
