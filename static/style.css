@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+    /* Consistent font usage */
+}
+
+.resource-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    /* Space between rows */
+}
+
+.resource-row button {
+    margin-right: 10px;
+    /* Space between buttons and text */
+}
+
+.resource-label {
+    flex-grow: 1;
+    /* Makes the label flexible in taking up remaining space */
+}

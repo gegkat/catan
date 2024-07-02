@@ -4,31 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Sheeps 5eva</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            /* Consistent font usage */
-        }
-
-        .resource-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 4px;
-            /* Space between rows */
-        }
-
-        .resource-row button {
-            margin-right: 10px;
-            /* Space between buttons and text */
-        }
-
-        .resource-label {
-            flex-grow: 1;
-            /* Makes the label flexible in taking up remaining space */
-        }
-    </style>
+    <link rel="stylesheet" href="static/style.css">
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='draw.js') }}" defer></script>
+    <script src="static/draw.js" defer></script>
 
     <script>
         let data = { hexagons: [], vertices: [], lines: [], players: {} };
