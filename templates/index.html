@@ -97,7 +97,7 @@
         }
 
         function draw(color) {
-            // console.log('Data received by draw:', data);
+            console.log('Data received by draw:', data);
 
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -119,12 +119,11 @@
                 drawVertex(ctx, vertex.x, vertex.y, vertex.radius, vertex.color)
             });
 
-            console.log('players:', color, data.players[color])
             Object.entries(data.players[color]).forEach(([resource, value]) => {
-                console.log(resource, value)
                 document.getElementById(resource).textContent = value;
             });
 
+            document.getElementById('dice').textContent = `${data.dice[0]} ${data.dice[1]}`;
         }
 
         function drawHexagon(ctx, center, vertices, color, number) {
@@ -206,6 +205,16 @@
         <option value="purple">Purple</option>
         <option value="blue">Blue</option>
     </select>
+
+    <br>
+    <br>
+
+    <div class="dice">
+        <button type="submit" onclick="handleButton(event, 'roll')">Roll Dice</button>
+        <span class="dice">Dice: <span id="dice">0 0</span></span>
+    </div>
+
+    <br>
 
     <div class="resource-row">
         <button onclick="handleButton(event, 'ore-dec')">-1</button>

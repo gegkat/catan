@@ -26,6 +26,7 @@ def parse_resource_action(action: str) -> str:
 def generate():
     action = flask.request.form.get('action')
     color = flask.request.form.get('color')
+    print('action', action)
     print('color', color)
     
     if action == 'hex':
@@ -40,6 +41,8 @@ def generate():
         game_state.back()
     elif action == 'forward':
         game_state.forward()
+    elif action == 'roll':
+        game_state.roll_dice()
     elif action.endswith('dec'):
         game_state.update_resource(parse_resource_action(action), -1, color)
     elif action.endswith('inc'):

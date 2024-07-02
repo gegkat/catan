@@ -1,7 +1,7 @@
 import flask
 import hexagon
 import copy
-from typing import Any
+import random
 
 class Player:
     def __init__(self) -> None:
@@ -26,8 +26,13 @@ class State:
                         'purple': Player(),
                         'blue': Player(),
                         }
+        self.dice = (0, 0)
         self.history = []
         self.future = []
+
+    def roll_dice(self):
+        self.dice = (random.randint(1, 6), random.randint(1, 6))
+        print(self.dice)
 
     def update_resource(self, resource: str, delta: int, color: str):
         self.players[color].update_resource(resource, delta)
@@ -109,6 +114,7 @@ class State:
         state_as_dict = {'hexagons': hexagon_dicts, 
                          'vertices': vertices_dicts, 
                          'lines': lines_dicts,
-                         'players': players_dicts}
+                         'players': players_dicts,
+                         'dice': self.dice}
         socketio.emit('state_update', state_as_dict)
         return flask.jsonify(state_as_dict)
