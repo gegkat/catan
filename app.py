@@ -27,6 +27,7 @@ def button():
     data = flask.request.json
     action = data['action']
     color = data['color']
+    print(action)
     
     if action == 'click':
         game_state.handle_click(hexagon.Pixel(data['x'], data['y']), color)

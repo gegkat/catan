@@ -13,13 +13,13 @@
 <body>
     <h1>Sheeps 5eva</h1>
 
-    <form id="hex-form" onsubmit="handleEvent(event)">
-        <button type="submit" onclick="handleEvent(event, 'hex')">Hex</button>
-        <button type="submit" onclick="handleEvent(event, 'big_hex')">Big Hex</button>
-        <button type="submit" onclick="handleEvent(event, 'diamond')">Diamond</button>
-        <button type="submit" onclick="handleEvent(event, 'big_diamond')">Big Diamond</button>
-        <button type="submit" onclick="handleEvent(event, 'back')">Back</button>
-        <button type="submit" onclick="handleEvent(event, 'forward')">Forward</button>
+    <form id="hex-form">
+        <button type="button" data-action="hex">Hex</button>
+        <button type="button" data-action="big_hex">Big Hex</button>
+        <button type="button" data-action="diamond">Diamond</button>
+        <button type="button" data-action="big_diamond">Big Diamond</button>
+        <button type="button" data-action="back">Back</button>
+        <button type="button" data-action="forward">Forward</button>
     </form>
 
     <label for="color-select">Choose your color:</label>
@@ -30,44 +30,41 @@
         <option value="blue">Blue</option>
     </select>
 
-    <br>
-    <br>
-
     <div class="dice">
-        <button type="submit" onclick="handleEvent(event, 'roll')">Roll Dice</button>
+        <button type="button" data-action="roll">Roll Dice</button>
         <span class="dice">Dice: <span id="dice">0 0</span></span>
     </div>
 
-    <br>
-
     <div class="resource-row">
-        <button onclick="handleEvent(event, 'ore-dec')">-1</button>
-        <button onclick="handleEvent(event, 'ore-inc')">+1</button>
+        <button data-action="ore-dec">-1</button>
+        <button data-action="ore-inc">+1</button>
         <span class="resource-label">Ore: <span id="ore">0</span></span>
     </div>
+
     <div class="resource-row">
-        <button onclick="handleEvent(event, 'brick-dec')">-1</button>
-        <button onclick="handleEvent(event, 'brick-inc')">+1</button>
+        <button data-action="brick-dec">-1</button>
+        <button data-action="brick-inc">+1</button>
         <span class="resource-label">Brick: <span id="brick">0</span></span>
     </div>
+
     <div class="resource-row">
-        <button onclick="handleEvent(event, 'wheat-dec')">-1</button>
-        <button onclick="handleEvent(event, 'wheat-inc')">+1</button>
+        <button data-action="wheat-dec">-1</button>
+        <button data-action="wheat-inc">+1</button>
         <span class="resource-label">Wheat: <span id="wheat">0</span></span>
     </div>
+
     <div class="resource-row">
-        <button onclick="handleEvent(event, 'sheep-dec')">-1</button>
-        <button onclick="handleEvent(event, 'sheep-inc')">+1</button>
+        <button data-action="sheep-dec">-1</button>
+        <button data-action="sheep-inc">+1</button>
         <span class="resource-label">Sheep: <span id="sheep">0</span></span>
     </div>
+
     <div class="resource-row">
-        <button onclick="handleEvent(event, 'wood-dec')">-1</button>
-        <button onclick="handleEvent(event, 'wood-inc')">+1</button>
+        <button data-action="wood-dec">-1</button>
+        <button data-action="wood-inc">+1</button>
         <span class="resource-label">Wood: <span id="wood">0</span></span>
     </div>
 
-
-    <br>
 
     <span>Cards held</span>
     <div class="other-players">
@@ -76,8 +73,6 @@
         <span class="other-player">Purple: <span id="purple">0</span></span>
         <span class="other-player">Blue: <span id="blue">0</span></span>
     </div>
-
-    <br>
 
     <canvas id="canvas" width="1000" height="600"></canvas>
     <p id="vertex-info"></p>
