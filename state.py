@@ -1,3 +1,4 @@
+import resource
 import flask
 import hexagon
 import copy
@@ -13,8 +14,14 @@ class Player:
             'sheep': 0,
         }
     
-    def update_resource(self, resource: str, delta: int):
+    def update_resource(self, resource: str, delta: int) -> None:
         self.resources[resource] = max(0, self.resources[resource] + delta)
+
+    def num_cards(self) -> int:
+        return sum(self.resources.values())
+
+    def to_dict(self):
+        return {'resources': self.resources, 'num_cards': self.num_cards()}
 
 class State:
     def __init__(self) -> None:
@@ -109,7 +116,7 @@ class State:
         hexagon_dicts = [hex.to_dict() for hex in self.hexagons]
         vertices_dicts = [v.to_dict() for v in self.vertices]
         lines_dicts = [l.to_dict() for l in self.lines]
-        players_dicts = {c: p.resources for c, p in self.players.items()}
+        players_dicts = {c: p.to_dict() for c, p in self.players.items()}
         state_as_dict = {'hexagons': hexagon_dicts, 
                          'vertices': vertices_dicts, 
                          'lines': lines_dicts,

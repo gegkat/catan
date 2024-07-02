@@ -119,11 +119,15 @@
                 drawVertex(ctx, vertex.x, vertex.y, vertex.radius, vertex.color)
             });
 
-            Object.entries(data.players[color]).forEach(([resource, value]) => {
+            Object.entries(data.players[color].resources).forEach(([resource, value]) => {
                 document.getElementById(resource).textContent = value;
             });
 
             document.getElementById('dice').textContent = `${data.dice[0]} ${data.dice[1]}`;
+            document.getElementById('cyan').textContent = `${data.players.cyan.num_cards}`;
+            document.getElementById('magenta').textContent = `${data.players.magenta.num_cards}`;
+            document.getElementById('purple').textContent = `${data.players.purple.num_cards}`;
+            document.getElementById('blue').textContent = `${data.players.blue.num_cards}`;
         }
 
         function drawHexagon(ctx, center, vertices, color, number) {
@@ -244,6 +248,17 @@
 
 
     <br>
+
+    <span>Cards held</span>
+    <div class="other-players">
+        <span class="other-player">Cyan: <span id="cyan">0</span></span>
+        <span class="other-player">Magenta: <span id="magenta">0</span></span>
+        <span class="other-player">Purple: <span id="purple">0</span></span>
+        <span class="other-player">Blue: <span id="blue">0</span></span>
+    </div>
+
+    <br>
+
     <canvas id="canvas" width="1000" height="600"></canvas>
     <p id="vertex-info"></p>
 </body>
