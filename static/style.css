@@ -11,7 +11,7 @@ body {
 }
 
 .resource-row button {
-    margin-right: 10px;
+    margin-right: 2px;
     /* Space between buttons and text */
 }
 
@@ -25,7 +25,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     /* Aligns items to the left */
-    margin-bottom: 20px;
+    margin-bottom: 2px;
 }
 
 .control-row label,
@@ -43,4 +43,25 @@ body {
 .dice button {
     margin-right: 20px;
     /* Adds space to the right of the Roll Dice button */
+}
+
+.resource-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.resource-row {
+    flex-basis: 10%;
+    /* Reducing the width of each column */
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+    margin-right: 2%;
+    /* Reduce the right margin to bring columns closer */
+}
+
+.resource-grid .resource-row:nth-child(2n) {
+    margin-right: 0;
+    /* Remove right margin for every second item */
 }
