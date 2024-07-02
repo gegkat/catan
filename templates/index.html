@@ -11,8 +11,6 @@
 </head>
 
 <body>
-    <h1>Sheeps 5eva</h1>
-
     <form id="hex-form">
         <button type="button" data-action="hex">Hex</button>
         <button type="button" data-action="big_hex">Big Hex</button>
@@ -22,17 +20,18 @@
         <button type="button" data-action="forward">Forward</button>
     </form>
 
-    <label for="color-select">Choose your color:</label>
-    <select id="color-select">
-        <option value="cyan">Cyan</option>
-        <option value="magenta">Magenta</option>
-        <option value="purple">Purple</option>
-        <option value="blue">Blue</option>
-    </select>
-
-    <div class="dice">
-        <button type="button" data-action="roll">Roll Dice</button>
-        <span class="dice">Dice: <span id="dice">0 0</span></span>
+    <div class="control-row">
+        <label for="color-select">Choose your color:</label>
+        <select id="color-select">
+            <option value="cyan">Cyan</option>
+            <option value="magenta">Magenta</option>
+            <option value="purple">Purple</option>
+            <option value="blue">Blue</option>
+        </select>
+        <div class="dice">
+            <button type="button" data-action="roll">Roll Dice</button>
+            <span>Dice: <span id="dice">0 0</span></span>
+        </div>
     </div>
 
     <div class="resource-row">
@@ -66,8 +65,8 @@
     </div>
 
 
-    <span>Cards held</span>
     <div class="other-players">
+        <span>Cards held. </span>
         <span class="other-player">Cyan: <span id="cyan">0</span></span>
         <span class="other-player">Magenta: <span id="magenta">0</span></span>
         <span class="other-player">Purple: <span id="purple">0</span></span>

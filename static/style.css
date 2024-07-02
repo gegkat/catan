@@ -19,3 +19,28 @@ body {
     flex-grow: 1;
     /* Makes the label flexible in taking up remaining space */
 }
+
+.control-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Aligns items to the left */
+    margin-bottom: 20px;
+}
+
+.control-row label,
+.control-row select,
+.control-row .dice {
+    margin-right: 10px;
+    /* Adjust as needed for spacing */
+}
+
+.dice {
+    display: flex;
+    align-items: center;
+}
+
+.dice button {
+    margin-right: 20px;
+    /* Adds space to the right of the Roll Dice button */
+}
