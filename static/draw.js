@@ -29,19 +29,23 @@ function drawHexagon(ctx, hexagon) {
 
     // Draw the number in the center if not 7
     if (hexagon.number !== 7) {
-        vertex = { x: hexagon.center[0], y: hexagon.center[1], radius: getRadius(hexagon.number), color: '#FFDAB9' }
+        vertex = {
+            x: hexagon.center[0], y: hexagon.center[1],
+            radius: getRadius(hexagon.number), color: '#FFDAB9',
+            outline: true
+        }
         drawVertex(ctx, vertex, true);
         drawText(ctx, hexagon.number.toString(), hexagon.center[0], hexagon.center[1], '20px Arial', 'black');
     }
 }
 
-function drawVertex(ctx, vertex, outline = false) {
+function drawVertex(ctx, vertex) {
     console.log('drawVertex', vertex)
     ctx.beginPath();
     ctx.arc(vertex.x, vertex.y, vertex.radius, 0, 2 * Math.PI);
     ctx.fillStyle = vertex.color;
     ctx.fill();
-    if (outline) {
+    if (vertex.outline) {
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 1;  // You can adjust this value to change the outline thickness
         ctx.stroke();

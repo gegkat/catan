@@ -142,18 +142,32 @@ class Vertex:
     def __init__(self, pixel: Pixel) -> None:
         self.pixel = pixel
         self.color = 'rgba(255, 255, 255, 0)'
+        self.state = 'none'
+        self.radius = VERTEX_RADIUS
+        self.outline = False
     
     def inside(self, pixel: Pixel) -> bool:
-        return pixel.distance(self.pixel) < VERTEX_RADIUS
+        return pixel.distance(self.pixel) < self.radius
 
-    def toggle_color(self, color) -> None:
-        if self.color == color:
-            self.color = 'rgba(255, 255, 255, 0)'
-        else:
+    def toggle(self, color) -> None:
+        if self.state == 'none':
+            self.state = 'settlement'
             self.color = color
+            self.radius = VERTEX_RADIUS
+            self.outline = False
+        elif self.state == 'settlement':
+            self.color = color
+            self.state = 'city'
+            self.radius = 1.3*VERTEX_RADIUS
+            self.outline = True
+        else:
+            self.state = 'none'
+            self.color = 'rgba(255, 255, 255, 0)'
+            self.outline = False
     
     def to_dict(self) -> dict[str, Any]:
-        return {'x': self.pixel.x, 'y': self.pixel.y, 'radius': VERTEX_RADIUS, 'color': self.color}
+        return {'x': self.pixel.x, 'y': self.pixel.y, 'radius': self.radius, 
+                'color': self.color, 'outline': self.outline}
     
 class Line:
     def __init__(self, start: Pixel, end: Pixel) -> None:

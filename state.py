@@ -88,7 +88,7 @@ class State:
         for vertex in self.vertices:
             if vertex.inside(click_pixel):
                 self.save_state()
-                vertex.toggle_color(color)
+                vertex.toggle(color)
                 return 
 
         for line in self.lines:
